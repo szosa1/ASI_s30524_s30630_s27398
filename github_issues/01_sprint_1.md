@@ -32,11 +32,10 @@ w sklearn `Pipeline` z działającymi testami i CI.
 ## Podział pracy (uzupełnia zespół na początku sprintu)
 
 | Element sprintu | Owner | Recenzent |
-| Przygotowanie EDA | Jakub Jaworski | Igor Kordaczuk |
-| Przygotowanie i testowanie baseline Pipelineu | Igor Kordaczuk | Szymon Olszewski |
-TODO (uzupełnij tu szymuś swoj udział)
+| --- | --- | --- |
+| _do uzupełnienia_ | | |
 
-Integrator sprintu: Szymon Olszewski
+Integrator sprintu: _do uzupełnienia_
 
 ## Pełny opis
 
