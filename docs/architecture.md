@@ -48,10 +48,25 @@ gotowy — sprawdza to `python scripts/check_dod.py`.
 <!-- DIAGRAM-V0:START -->
 ```mermaid
 flowchart LR
-    data["TODO: źródło danych"] --> model["TODO: kolejne elementy systemu"]
+    subgraph Trening_S1 [Zaimplementowane w S1]
+        A[Dane UCI: online_shoppers] --> B[input normalization data.py]
+        B --> C[training-only filtering data.py]
+        C --> D[model preprocessing model.py]
+        D --> E[Model LogisticRegression]
+    end
+
+    subgraph Serwowanie_Planowane [Planowane]
+        F[Sklep internetowy] -->|1. Żądanie| G[API]
+        G -->|2. normalize_input| H[Wczytany Model]
+        H -->|3. Wynik predykcji| G
+        G -->|4. Zapis predykcji| I[(Baza danych)]
+        G -->|5. Odpowiedź| F
+    end
+
+    E -. Przekazanie modelu .-> H
 ```
 
-TODO: krótki opis diagramu (3–5 zdań).
+Diagram pokazuje podział na to co zostało aktualnie zrobione czyli pipeline treningowy oraz to jak będzie funkcjonowala calość w przyszłości. Dane są pobierane, przechodza przez normalizacje, filtrowanie treningowe i preprocessing po to żeby wtrenować model LogisticRegression. W docelowym projekcie z żądaniem predykcji będzie sie zgłaszał sklep internetowy, wczytany model zostanie wywołany, dokona predykcji a nastepnie zapisze ją do bazy i odeśle do sklepu internetowego.
 <!-- DIAGRAM-V0:END -->
 
 ## Historia zmian architektury
