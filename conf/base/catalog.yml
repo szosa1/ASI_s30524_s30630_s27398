@@ -2,4 +2,15 @@
 # TODO (zespół): zdefiniuj wejścia/wyjścia w formacie Kedro Data Catalog,
 # np. raw_data, dane po przetworzeniu, model i metryki.
 # Użyj nazw klas zakończonych na Dataset, zgodnie z wersją Kedro.
-{}
+
+# Wejście: dane ze scripts/download_data.py
+raw_data:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/online_shoppers/online_shoppers_intention.csv
+
+# Wyjście
+model_input:
+  type: pandas.CSVDataset
+  filepath: data/02_intermediate/model_input.csv
+  save_args:
+    index: false
