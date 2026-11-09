@@ -1,4 +1,29 @@
 # Sprint 2 — parametry pipeline'u.
-# TODO (zespół): dodaj test_size, random_state i inne parametry zgodne
-# z project.yaml oraz kontraktem wybranego datasetu.
+
 dataset_id: online_shoppers
+
+#Parametry do podziału train/test i random state
+test_size: 0.2
+random_state: 42
+
+#Ficzery numeryczne
+numeric_features:
+  - Administrative
+  - Administrative_Duration
+  - Informational
+  - Informational_Duration
+  - ProductRelated
+  - ProductRelated_Duration
+  - BounceRates
+  - ExitRates
+  - SpecialDay
+
+#Ficzery kategoryczne
+categorical_features:
+  - Month
+  - OperatingSystems
+  - Browser
+  - Region
+  - TrafficType
+  - VisitorType
+  - Weekend
