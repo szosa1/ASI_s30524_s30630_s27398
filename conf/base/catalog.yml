@@ -14,3 +14,12 @@ model_input:
   filepath: data/02_intermediate/model_input.csv
   save_args:
     index: false
+
+model:
+  type: pickle.PickleDataset
+  filepath: data/06_models/model.pkl
+  versioned: true
+
+metrics:
+  type: json.JSONDataset
+  filepath: metrics.json
