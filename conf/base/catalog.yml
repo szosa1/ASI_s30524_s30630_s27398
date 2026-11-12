@@ -22,4 +22,4 @@ model:
 
 metrics:
   type: json.JSONDataset
-  filepath: metrics.json
+  filepath: data/08_reporting/kedro_metrics.json
