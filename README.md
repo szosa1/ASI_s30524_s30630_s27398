@@ -182,3 +182,24 @@ z tych elementów.
 Ogólną architekturę warstw opisuje [`docs/architecture.md`](docs/architecture.md).
 Przypięte instalacje kolejnych sprintów: `requirements/preflight-s2.txt` (Kedro, pod koniec S1)
 i `requirements/preflight-s3.txt` (W&B i AutoGluon, pod koniec S2).
+
+## Kedro quickstart - Sprint 2
+### Przygotowanie środowiska
+
+- ``conda env update -n asi-ml -f environment.yml --prune``
+- ``conda activate asi-ml``
+- ``python -m pip install --no-deps -e .``
+- ``python -m pip install -r requirements/preflight-s2.txt -c constraints.txt``
+
+Pobranie danych
+
+- ``python scripts/download_data.py``
+
+### Uruchomienie pipeline'u
+Pełny zbiór danych:
+
+- ``kedro run``
+
+Próbka CI:
+
+- ``kedro run --env ci``
