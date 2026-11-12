@@ -6,6 +6,7 @@
 !/data/**/README.md
 !/data/**/.gitkeep
 !/data/01_raw/sample.csv
+/data/06_models/model.pkl
 
 # --- Sekrety i konfiguracja lokalna -----------------------------------------
 .env
@@ -36,3 +37,5 @@ dist/
 .DS_Store
 Thumbs.db
 .idea/
+venv/
+venv/

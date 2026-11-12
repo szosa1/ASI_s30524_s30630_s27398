@@ -80,3 +80,4 @@ Diagram pokazuje podział na to co zostało aktualnie zrobione czyli pipeline tr
 | Sprint | Zmiana | Powiązany ADR |
 |---|---|---|
 | S1 | diagram v0 | — |
+| S2 | Przeniesienie treningu do Kedro (data_processing, data_science) | ADR-1 |
