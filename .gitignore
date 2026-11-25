@@ -39,3 +39,7 @@ Thumbs.db
 .idea/
 venv/
 venv/
+
+
+wandb/
+AutogluonModels/
