@@ -31,3 +31,9 @@ baseline_package_metadata:
 autogluon_metrics:
   type: json.JSONDataset
   filepath: data/08_reporting/autogluon_metrics.json
+
+model_comparison:
+  type: pandas.CSVDataset
+  filepath: data/08_reporting/model_comparison.csv
+  save_args:
+    index: false

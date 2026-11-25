@@ -35,6 +35,9 @@ wandb:
 
 model_packages_dir: data/06_models/packages
 
+production_model: baseline_logreg
+
+autogluon_enabled: true
 autogluon_models_dir: data/06_models/autogluon
 
 autogluon_configs:

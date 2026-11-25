@@ -1,6 +1,7 @@
 from kedro.pipeline import Pipeline, node
 
 from .nodes import (
+    compare_models,
     compute_data_fingerprint,
     evaluate_model,
     log_baseline_run,
@@ -89,12 +90,25 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "y_test",
                     "data_fingerprint",
                     "params:dataset_id",
+                    "params:autogluon_enabled",
                     "params:autogluon_configs",
                     "params:autogluon_models_dir",
                     "params:wandb",
                 ],
                 outputs="autogluon_metrics",
                 name="train_autogluon_node",
+            ),
+            node(
+                func=compare_models,
+                inputs=[
+                    "X_test",
+                    "baseline_package_metadata",
+                    "autogluon_metrics",
+                    "params:model_packages_dir",
+                    "params:autogluon_models_dir",
+                ],
+                outputs="model_comparison",
+                name="compare_models_node",
             ),
         ]
     )
