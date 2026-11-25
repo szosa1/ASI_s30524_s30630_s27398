@@ -6,6 +6,7 @@ from .nodes import (
     log_baseline_run,
     package_baseline,
     split_data,
+    train_autogluon,
     train_model,
 )
 
@@ -78,6 +79,22 @@ def create_pipeline(**kwargs) -> Pipeline:
                 ],
                 outputs="baseline_package_metadata",
                 name="package_baseline_node",
+            ),
+            node(
+                func=train_autogluon,
+                inputs=[
+                    "X_train",
+                    "y_train",
+                    "X_test",
+                    "y_test",
+                    "data_fingerprint",
+                    "params:dataset_id",
+                    "params:autogluon_configs",
+                    "params:autogluon_models_dir",
+                    "params:wandb",
+                ],
+                outputs="autogluon_metrics",
+                name="train_autogluon_node",
             ),
         ]
     )

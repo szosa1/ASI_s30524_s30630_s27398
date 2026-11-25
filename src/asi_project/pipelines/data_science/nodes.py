@@ -131,3 +131,46 @@ def package_baseline(
     )
     save_model_package(model, Path(model_packages_dir) / BASELINE_NAME, metadata)
     return metadata
+
+
+def train_autogluon(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+    data_fingerprint: dict,
+    dataset_id: str,
+    autogluon_configs: dict,
+    autogluon_models_dir: str,
+    wandb_params: dict,
+) -> dict:
+    if not autogluon_configs:
+        return {}
+    from autogluon.tabular import TabularPredictor
+
+    target = get_contract(dataset_id).target
+    train = X_train.assign(**{target: y_train})
+    results = {}
+    for name, params in autogluon_configs.items():
+        run = init_wandb_run(
+            name=name,
+            job_type="autogluon",
+            config={
+                "model_name": name,
+                **params,
+                "dataset": dataset_id,
+                "data_fingerprint": data_fingerprint,
+            },
+            tags=["s3", "autogluon"],
+            project=wandb_params.get("project"),
+            entity=wandb_params.get("entity"),
+        )
+        with run:
+            predictor = TabularPredictor(
+                label=target, eval_metric="f1", path=f"{autogluon_models_dir}/{name}"
+            )
+            predictor.fit(train, **params)
+            metrics = compute_metrics(y_test, predictor.predict(X_test))
+            log_test_metrics(run, metrics)
+        results[name] = metrics
+    return results

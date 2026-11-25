@@ -27,3 +27,7 @@ metrics:
 baseline_package_metadata:
   type: json.JSONDataset
   filepath: data/08_reporting/baseline_package_metadata.json
+
+autogluon_metrics:
+  type: json.JSONDataset
+  filepath: data/08_reporting/autogluon_metrics.json
