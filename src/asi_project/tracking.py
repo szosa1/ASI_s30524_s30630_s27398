@@ -85,3 +85,20 @@ def log_test_metrics(run, metrics: Mapping[str, Any]) -> None:
     for key, value in metrics.get("confusion_matrix", {}).items():
         flat[f"test/cm_{key}"] = value
     run.log(flat)
+
+
+def log_production_artifact(run, package_dir: Path | str) -> None:
+    import wandb
+
+    package_dir = Path(package_dir)
+
+    if not (package_dir / "metadata.json").is_file():
+        raise FileNotFoundError("Brak metadata.json w pakiecie modelu.")
+
+    artifact = wandb.Artifact(
+        name="online-shoppers-model",
+        type="model",
+    )
+
+    artifact.add_dir(str(package_dir))
+    run.log_artifact(artifact, aliases=["production"]).wait()
