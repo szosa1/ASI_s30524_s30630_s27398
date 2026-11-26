@@ -34,3 +34,16 @@ wandb:
   entity: wnukdominika-polish-japanese-academy-of-information-tec
 
 model_packages_dir: data/06_models/packages
+
+production_model: baseline_logreg
+
+autogluon_enabled: true
+autogluon_models_dir: data/06_models/autogluon
+
+autogluon_configs:
+  ag_medium:
+    presets: medium_quality
+    time_limit: 120
+  ag_good:
+    presets: good_quality
+    time_limit: 300

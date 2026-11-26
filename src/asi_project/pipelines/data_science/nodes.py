@@ -1,11 +1,19 @@
+import time
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pandas as pd
+import psutil
 
 from asi_project.data import make_xy, split_train_test
 from asi_project.metrics import compute_metrics
 from asi_project.model import build_baseline_pipeline
-from asi_project.model_package import build_metadata, save_model_package
+from asi_project.model_package import (
+    build_metadata,
+    load_model_package,
+    package_size_bytes,
+    save_model_package,
+)
 from asi_project.pipelines.data_processing.nodes import get_contract
 from asi_project.tracking import (
     dataframe_fingerprint,
@@ -131,3 +139,92 @@ def package_baseline(
     )
     save_model_package(model, Path(model_packages_dir) / BASELINE_NAME, metadata)
     return metadata
+
+
+def train_autogluon(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+    data_fingerprint: dict,
+    dataset_id: str,
+    autogluon_enabled: bool,
+    autogluon_configs: dict,
+    autogluon_models_dir: str,
+    wandb_params: dict,
+) -> dict:
+    if not autogluon_enabled:
+        return {}
+    from autogluon.tabular import TabularPredictor
+
+    target = get_contract(dataset_id).target
+    train = X_train.assign(**{target: y_train})
+    results = {}
+    for name, params in autogluon_configs.items():
+        run = init_wandb_run(
+            name=name,
+            job_type="autogluon",
+            config={
+                "model_name": name,
+                **params,
+                "dataset": dataset_id,
+                "data_fingerprint": data_fingerprint,
+            },
+            tags=["s3", "autogluon"],
+            project=wandb_params.get("project"),
+            entity=wandb_params.get("entity"),
+        )
+        with run:
+            predictor = TabularPredictor(
+                label=target, eval_metric="f1", path=f"{autogluon_models_dir}/{name}"
+            )
+            predictor.fit(train, **params)
+            metrics = compute_metrics(y_test, predictor.predict(X_test))
+            log_test_metrics(run, metrics)
+        results[name] = metrics
+    return results
+
+
+def _measure_model(path: str, X: pd.DataFrame) -> dict:
+    if (Path(path) / "predictor.pkl").is_file():
+        from autogluon.tabular import TabularPredictor
+
+        model = TabularPredictor.load(path)
+    else:
+        model = load_model_package(path).model
+    model.predict(X)
+    start = time.perf_counter()
+    for _ in range(100):
+        model.predict(X)
+    return {
+        "predict_1_row_ms": (time.perf_counter() - start) / 100 * 1000,
+        "memory_mb": psutil.Process().memory_info().rss / 2**20,
+    }
+
+
+def compare_models(
+    X_test: pd.DataFrame,
+    baseline_package_metadata: dict,
+    autogluon_metrics: dict,
+    model_packages_dir: str,
+    autogluon_models_dir: str,
+) -> pd.DataFrame:
+    baseline_name = baseline_package_metadata["model_name"]
+    models = {baseline_name: (model_packages_dir, baseline_package_metadata["metrics"])}
+    for name, metrics in autogluon_metrics.items():
+        models[name] = (autogluon_models_dir, metrics)
+
+    rows = []
+    for name, (models_dir, metrics) in models.items():
+        path = f"{models_dir}/{name}"
+        with ProcessPoolExecutor(max_workers=1) as pool:
+            measured = pool.submit(_measure_model, path, X_test.head(1)).result()
+        rows.append(
+            {
+                "model": name,
+                "f1": metrics["f1"],
+                **measured,
+                "size_mb": package_size_bytes(path) / 2**20,
+            }
+        )
+    return pd.DataFrame(rows).round(3)
